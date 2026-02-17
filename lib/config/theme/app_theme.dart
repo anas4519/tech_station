@@ -32,7 +32,7 @@ class AppTheme {
         scrolledUnderElevation: 0.5,
         backgroundColor: AppColors.lightBg,
         foregroundColor: AppColors.grey900,
-        titleTextStyle: GoogleFonts.inter(
+        titleTextStyle: GoogleFonts.sourceCodePro(
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: AppColors.grey900,
@@ -69,7 +69,10 @@ class AppTheme {
           borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: AppColors.error),
         ),
-        hintStyle: GoogleFonts.inter(color: AppColors.grey500, fontSize: 14),
+        hintStyle: GoogleFonts.sourceCodePro(
+          color: AppColors.grey500,
+          fontSize: 14,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -80,7 +83,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: GoogleFonts.inter(
+          textStyle: GoogleFonts.sourceCodePro(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -94,7 +97,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(14),
           ),
           side: const BorderSide(color: AppColors.primary),
-          textStyle: GoogleFonts.inter(
+          textStyle: GoogleFonts.sourceCodePro(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -103,7 +106,7 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.grey100,
         selectedColor: AppColors.primarySurface,
-        labelStyle: GoogleFonts.inter(
+        labelStyle: GoogleFonts.sourceCodePro(
           fontSize: 13,
           fontWeight: FontWeight.w500,
         ),
@@ -148,7 +151,7 @@ class AppTheme {
         scrolledUnderElevation: 0.5,
         backgroundColor: AppColors.darkBg,
         foregroundColor: AppColors.grey100,
-        titleTextStyle: GoogleFonts.inter(
+        titleTextStyle: GoogleFonts.sourceCodePro(
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: AppColors.grey100,
@@ -185,7 +188,10 @@ class AppTheme {
           borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: AppColors.error),
         ),
-        hintStyle: GoogleFonts.inter(color: AppColors.grey600, fontSize: 14),
+        hintStyle: GoogleFonts.sourceCodePro(
+          color: AppColors.grey600,
+          fontSize: 14,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -196,7 +202,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: GoogleFonts.inter(
+          textStyle: GoogleFonts.sourceCodePro(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -210,7 +216,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(14),
           ),
           side: const BorderSide(color: AppColors.accentLight),
-          textStyle: GoogleFonts.inter(
+          textStyle: GoogleFonts.sourceCodePro(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -219,7 +225,7 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.darkElevated,
         selectedColor: AppColors.primaryDark,
-        labelStyle: GoogleFonts.inter(
+        labelStyle: GoogleFonts.sourceCodePro(
           fontSize: 13,
           fontWeight: FontWeight.w500,
         ),
@@ -245,69 +251,69 @@ class AppTheme {
         : AppColors.grey100;
 
     return TextTheme(
-      displayLarge: GoogleFonts.inter(
+      displayLarge: GoogleFonts.sourceCodePro(
         fontSize: 32,
         fontWeight: FontWeight.w800,
         color: color,
         letterSpacing: -1.0,
       ),
-      displayMedium: GoogleFonts.inter(
+      displayMedium: GoogleFonts.sourceCodePro(
         fontSize: 28,
         fontWeight: FontWeight.w700,
         color: color,
         letterSpacing: -0.5,
       ),
-      headlineLarge: GoogleFonts.inter(
+      headlineLarge: GoogleFonts.sourceCodePro(
         fontSize: 24,
         fontWeight: FontWeight.w700,
         color: color,
       ),
-      headlineMedium: GoogleFonts.inter(
+      headlineMedium: GoogleFonts.sourceCodePro(
         fontSize: 20,
         fontWeight: FontWeight.w600,
         color: color,
       ),
-      titleLarge: GoogleFonts.inter(
+      titleLarge: GoogleFonts.sourceCodePro(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         color: color,
       ),
-      titleMedium: GoogleFonts.inter(
+      titleMedium: GoogleFonts.sourceCodePro(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: color,
       ),
-      titleSmall: GoogleFonts.inter(
+      titleSmall: GoogleFonts.sourceCodePro(
         fontSize: 14,
         fontWeight: FontWeight.w600,
         color: color,
       ),
-      bodyLarge: GoogleFonts.inter(
+      bodyLarge: GoogleFonts.sourceCodePro(
         fontSize: 16,
         fontWeight: FontWeight.w400,
         color: color,
       ),
-      bodyMedium: GoogleFonts.inter(
+      bodyMedium: GoogleFonts.sourceCodePro(
         fontSize: 14,
         fontWeight: FontWeight.w400,
         color: color,
       ),
-      bodySmall: GoogleFonts.inter(
+      bodySmall: GoogleFonts.sourceCodePro(
         fontSize: 12,
         fontWeight: FontWeight.w400,
         color: color.withValues(alpha: 0.7),
       ),
-      labelLarge: GoogleFonts.inter(
+      labelLarge: GoogleFonts.sourceCodePro(
         fontSize: 14,
         fontWeight: FontWeight.w600,
         color: color,
       ),
-      labelMedium: GoogleFonts.inter(
+      labelMedium: GoogleFonts.sourceCodePro(
         fontSize: 12,
         fontWeight: FontWeight.w500,
         color: color,
       ),
-      labelSmall: GoogleFonts.inter(
+      labelSmall: GoogleFonts.sourceCodePro(
         fontSize: 10,
         fontWeight: FontWeight.w500,
         color: color.withValues(alpha: 0.7),

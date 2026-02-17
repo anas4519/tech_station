@@ -106,7 +106,7 @@ class _LoginPageState extends State<LoginPage>
                   Center(
                     child: Text(
                       'Tech Station',
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.sourceCodePro(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
                         color: theme.colorScheme.onSurface,
