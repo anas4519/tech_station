@@ -12,4 +12,9 @@ abstract class DeviceRepository {
   Future<Either<Failure, List<DeviceEntity>>> getDevicesByBrand(String brand);
   Future<Either<Failure, List<DeviceEntity>>> searchDevices(String query);
   Future<Either<Failure, List<DeviceEntity>>> getFeaturedDevices();
+  Future<Either<Failure, List<String>>> getCategories();
+  Future<Either<Failure, List<String>>> uploadCameraSample(
+    String deviceId,
+    String filePath,
+  );
 }

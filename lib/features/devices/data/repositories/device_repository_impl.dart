@@ -76,4 +76,30 @@ class DeviceRepositoryImpl implements DeviceRepository {
       return Left(ServerFailure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, List<String>>> getCategories() async {
+    try {
+      final categories = await remoteDataSource.getCategories();
+      return Right(categories);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<String>>> uploadCameraSample(
+    String deviceId,
+    String filePath,
+  ) async {
+    try {
+      final samples = await remoteDataSource.uploadCameraSample(
+        deviceId,
+        filePath,
+      );
+      return Right(samples);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
 }

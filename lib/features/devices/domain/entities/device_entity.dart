@@ -11,6 +11,7 @@ class DeviceEntity extends Equatable {
   final String? releaseDate;
   final double price;
   final String? shortDescription;
+  final String? deviceModel;
 
   // ── Specs ──
   final String? processor;
@@ -62,6 +63,7 @@ class DeviceEntity extends Equatable {
     this.releaseDate,
     this.price = 0,
     this.shortDescription,
+    this.deviceModel,
     this.processor,
     this.ram,
     this.storage,

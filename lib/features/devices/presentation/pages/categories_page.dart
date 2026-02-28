@@ -4,8 +4,11 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../../../../config/theme/app_colors.dart';
 import '../../../../core/utils/constants.dart';
+import '../../../../core/usecases/usecase.dart';
 import '../../../../core/widgets/loading_widget.dart';
 import '../../../../core/widgets/error_widget.dart';
+import '../../../../injection_container.dart';
+import '../../domain/usecases/get_categories.dart';
 import '../bloc/device_list_bloc.dart';
 import '../bloc/device_list_event.dart';
 import '../bloc/device_list_state.dart';
@@ -21,11 +24,25 @@ class CategoriesPage extends StatefulWidget {
 class _CategoriesPageState extends State<CategoriesPage> {
   String _selectedBrand = 'All';
   String _selectedCategory = 'All';
+  List<String> _categories = ['All'];
+  bool _categoriesLoading = true;
 
   @override
   void initState() {
     super.initState();
     context.read<DeviceListBloc>().add(DeviceListFetchAll());
+    _fetchCategories();
+  }
+
+  Future<void> _fetchCategories() async {
+    final result = await sl<GetCategories>()(NoParams());
+    result.fold(
+      (_) => setState(() => _categoriesLoading = false),
+      (categories) => setState(() {
+        _categories = ['All', ...categories];
+        _categoriesLoading = false;
+      }),
+    );
   }
 
   @override
@@ -95,28 +112,46 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     const SizedBox(height: 8),
                     SizedBox(
                       height: 40,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: AppConstants.deviceCategories.length,
-                        itemBuilder: (context, index) {
-                          final category = AppConstants.deviceCategories[index];
-                          final isSelected = category == _selectedCategory;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: FilterChip(
-                              label: Text(category),
-                              selected: isSelected,
-                              onSelected: (_) => _onCategorySelected(category),
-                              selectedColor: isDark
-                                  ? AppColors.primary.withValues(alpha: 0.3)
-                                  : AppColors.primarySurface,
-                              checkmarkColor: isDark
-                                  ? AppColors.accentLight
-                                  : AppColors.primary,
+                      child: _categoriesLoading
+                          ? const Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _categories.length,
+                              itemBuilder: (context, index) {
+                                final category = _categories[index];
+                                final isSelected =
+                                    category == _selectedCategory;
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: FilterChip(
+                                    label: Text(
+                                      category.isNotEmpty
+                                          ? '${category[0].toUpperCase()}${category.substring(1)}'
+                                          : category,
+                                    ),
+                                    selected: isSelected,
+                                    onSelected: (_) =>
+                                        _onCategorySelected(category),
+                                    selectedColor: isDark
+                                        ? AppColors.primary.withValues(
+                                            alpha: 0.3,
+                                          )
+                                        : AppColors.primarySurface,
+                                    checkmarkColor: isDark
+                                        ? AppColors.accentLight
+                                        : AppColors.primary,
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
                     ),
 
                     const SizedBox(height: 20),

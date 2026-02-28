@@ -25,3 +25,12 @@ class DeviceDetailError extends DeviceDetailState {
   @override
   List<Object?> get props => [message];
 }
+
+class DeviceDetailCameraSampleUploading extends DeviceDetailState {}
+
+class DeviceDetailCameraSampleUploaded extends DeviceDetailState {
+  final List<String> updatedSamples;
+  const DeviceDetailCameraSampleUploaded(this.updatedSamples);
+  @override
+  List<Object?> get props => [updatedSamples];
+}

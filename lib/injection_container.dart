@@ -14,9 +14,11 @@ import 'features/devices/data/datasources/device_remote_data_source.dart';
 import 'features/devices/data/repositories/device_repository_impl.dart';
 import 'features/devices/domain/repositories/device_repository.dart';
 import 'features/devices/domain/usecases/get_all_devices.dart';
+import 'features/devices/domain/usecases/get_categories.dart';
 import 'features/devices/domain/usecases/get_device_by_id.dart';
 import 'features/devices/domain/usecases/get_devices_by_category.dart';
 import 'features/devices/domain/usecases/search_devices.dart';
+import 'features/devices/domain/usecases/upload_camera_sample.dart';
 import 'features/devices/presentation/bloc/device_list_bloc.dart';
 import 'features/account/presentation/bloc/theme_bloc.dart';
 
@@ -71,6 +73,8 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => GetDeviceById(sl()));
   sl.registerLazySingleton(() => GetDevicesByCategory(sl()));
   sl.registerLazySingleton(() => SearchDevices(sl()));
+  sl.registerLazySingleton(() => GetCategories(sl()));
+  sl.registerLazySingleton(() => UploadCameraSample(sl()));
 
   // BLoC
   sl.registerFactory(
@@ -78,6 +82,7 @@ Future<void> initDependencies() async {
       getAllDevices: sl(),
       getDevicesByCategory: sl(),
       searchDevices: sl(),
+      getCategories: sl(),
     ),
   );
 

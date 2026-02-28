@@ -30,3 +30,5 @@ class DeviceListSearch extends DeviceListEvent {
 }
 
 class DeviceListFetchFeatured extends DeviceListEvent {}
+
+class DeviceListFetchCategories extends DeviceListEvent {}

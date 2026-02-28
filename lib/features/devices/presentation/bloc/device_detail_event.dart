@@ -12,3 +12,14 @@ class DeviceDetailFetch extends DeviceDetailEvent {
   @override
   List<Object?> get props => [deviceId];
 }
+
+class DeviceDetailUploadCameraSample extends DeviceDetailEvent {
+  final String deviceId;
+  final String filePath;
+  const DeviceDetailUploadCameraSample({
+    required this.deviceId,
+    required this.filePath,
+  });
+  @override
+  List<Object?> get props => [deviceId, filePath];
+}

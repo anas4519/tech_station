@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../config/theme/app_colors.dart';
 import '../../../../core/widgets/loading_widget.dart';
@@ -27,12 +31,61 @@ class DeviceDetailPage extends StatefulWidget {
 class _DeviceDetailPageState extends State<DeviceDetailPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  String _physicalDeviceModel = '';
+  bool _isUploading = false;
+  List<String>? _updatedSamples;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     context.read<DeviceDetailBloc>().add(DeviceDetailFetch(widget.deviceId));
+    _detectPhysicalDevice();
+  }
+
+  Future<void> _detectPhysicalDevice() async {
+    final deviceInfo = DeviceInfoPlugin();
+    String model = '';
+    if (Platform.isAndroid) {
+      final info = await deviceInfo.androidInfo;
+      model = info.model; // e.g. "Pixel 8 Pro"
+    } else if (Platform.isIOS) {
+      final info = await deviceInfo.iosInfo;
+      model = info.name; // e.g. "Anas's iPhone 15 Pro"
+      // Also try utsname.machine for exact model
+      final machine = info.utsname.machine; // e.g. "iPhone16,2"
+      // Combine both for matching
+      model = '$model $machine';
+    }
+    if (mounted) {
+      setState(() => _physicalDeviceModel = model.toLowerCase());
+    }
+  }
+
+  bool _isCurrentDevice(DeviceEntity device) {
+    if (_physicalDeviceModel.isEmpty ||
+        device.deviceModel == null ||
+        device.deviceModel!.isEmpty) {
+      return false;
+    }
+    final model = device.deviceModel!.toLowerCase();
+    // Exact or substring match against the physical device model string
+    return _physicalDeviceModel.contains(model) ||
+        model.contains(_physicalDeviceModel);
+  }
+
+  Future<void> _onCaptureSample(String deviceId) async {
+    final picker = ImagePicker();
+    final photo = await picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 90,
+      maxWidth: 4096,
+    );
+    if (photo == null || !mounted) return;
+
+    context.read<DeviceDetailBloc>().add(
+      DeviceDetailUploadCameraSample(deviceId: deviceId, filePath: photo.path),
+    );
   }
 
   @override
@@ -47,7 +100,36 @@ class _DeviceDetailPageState extends State<DeviceDetailPage>
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      body: BlocBuilder<DeviceDetailBloc, DeviceDetailState>(
+      body: BlocConsumer<DeviceDetailBloc, DeviceDetailState>(
+        listener: (context, state) {
+          if (state is DeviceDetailCameraSampleUploading) {
+            setState(() => _isUploading = true);
+          } else if (state is DeviceDetailCameraSampleUploaded) {
+            setState(() {
+              _isUploading = false;
+              _updatedSamples = state.updatedSamples;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Camera sample uploaded successfully!'),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          } else if (state is DeviceDetailError && _isUploading) {
+            setState(() => _isUploading = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Upload failed: ${state.message}'),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        buildWhen: (previous, current) =>
+            current is DeviceDetailLoading ||
+            current is DeviceDetailLoaded ||
+            (current is DeviceDetailError && previous is! DeviceDetailLoaded),
         builder: (context, state) {
           if (state is DeviceDetailLoading) {
             return const AppLoadingWidget(message: 'Loading device...');
@@ -391,9 +473,17 @@ class _DeviceDetailPageState extends State<DeviceDetailPage>
   }
 
   Widget _buildCameraTab(DeviceEntity device) {
+    final samples = _updatedSamples ?? device.cameraSamples;
+    final isCurrent = _isCurrentDevice(device);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child: CameraSamplesGallery(samples: device.cameraSamples),
+      child: CameraSamplesGallery(
+        samples: samples,
+        isCurrentDevice: isCurrent,
+        isUploading: _isUploading,
+        onCaptureSample: () => _onCaptureSample(device.id),
+      ),
     );
   }
 

@@ -16,6 +16,7 @@ import '../../features/community/presentation/pages/community_page.dart';
 import '../../features/account/presentation/pages/account_page.dart';
 import '../../injection_container.dart';
 import '../../features/devices/domain/usecases/get_device_by_id.dart';
+import '../../features/devices/domain/usecases/upload_camera_sample.dart';
 
 class AppRouter {
   AppRouter._();
@@ -110,8 +111,10 @@ class AppRouter {
           builder: (context, state) {
             final deviceId = state.pathParameters['id']!;
             return BlocProvider(
-              create: (_) =>
-                  DeviceDetailBloc(getDeviceById: sl<GetDeviceById>()),
+              create: (_) => DeviceDetailBloc(
+                getDeviceById: sl<GetDeviceById>(),
+                uploadCameraSample: sl<UploadCameraSample>(),
+              ),
               child: DeviceDetailPage(deviceId: deviceId),
             );
           },

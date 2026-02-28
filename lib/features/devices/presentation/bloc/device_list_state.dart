@@ -31,3 +31,10 @@ class DeviceListError extends DeviceListState {
   @override
   List<Object?> get props => [message];
 }
+
+class DeviceCategoriesLoaded extends DeviceListState {
+  final List<String> categories;
+  const DeviceCategoriesLoaded(this.categories);
+  @override
+  List<Object?> get props => [categories];
+}
