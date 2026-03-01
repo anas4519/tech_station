@@ -43,6 +43,9 @@ class DeviceEntity extends Equatable {
   // ── Camera samples ──
   final List<String> cameraSamples;
 
+  // ── Affiliate Links ──
+  final List<Map<String, String>> affiliateLinks;
+
   // ── Review ──
   final String? reviewSummary;
   final List<String> pros;
@@ -88,6 +91,7 @@ class DeviceEntity extends Equatable {
     this.displayScore = 0,
     this.valueScore = 0,
     this.cameraSamples = const [],
+    this.affiliateLinks = const [],
     this.reviewSummary,
     this.pros = const [],
     this.cons = const [],
@@ -97,5 +101,12 @@ class DeviceEntity extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, name, brand, category, overallScore];
+  List<Object?> get props => [
+    id,
+    name,
+    brand,
+    category,
+    overallScore,
+    affiliateLinks,
+  ];
 }

@@ -18,6 +18,7 @@ import '../widgets/score_badge.dart';
 import '../widgets/spec_table.dart';
 import '../widgets/review_section.dart';
 import '../widgets/camera_samples_gallery.dart';
+import '../widgets/affiliate_links_section.dart';
 
 class DeviceDetailPage extends StatefulWidget {
   final String deviceId;
@@ -412,6 +413,8 @@ class _DeviceDetailPageState extends State<DeviceDetailPage>
             'Display',
             device.display ?? 'N/A',
           ),
+          // ── Affiliate Links ──
+          AffiliateLinksSection(links: device.affiliateLinks),
         ],
       ),
     );

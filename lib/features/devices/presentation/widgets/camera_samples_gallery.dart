@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../../../../config/theme/app_colors.dart';
 
@@ -45,15 +46,12 @@ class CameraSamplesGallery extends StatelessWidget {
             ),
           )
         else
-          GridView.builder(
+          MasonryGridView.count(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              childAspectRatio: 1,
-            ),
+            crossAxisCount: 2,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
             itemCount: samples.length,
             itemBuilder: (context, index) {
               return GestureDetector(
@@ -66,6 +64,7 @@ class CameraSamplesGallery extends StatelessWidget {
                       imageUrl: samples[index],
                       fit: BoxFit.cover,
                       placeholder: (_, __) => Container(
+                        height: index.isEven ? 200 : 260,
                         color: isDark
                             ? AppColors.darkElevated
                             : AppColors.grey100,
@@ -74,6 +73,7 @@ class CameraSamplesGallery extends StatelessWidget {
                         ),
                       ),
                       errorWidget: (_, __, ___) => Container(
+                        height: 180,
                         color: isDark
                             ? AppColors.darkElevated
                             : AppColors.grey100,

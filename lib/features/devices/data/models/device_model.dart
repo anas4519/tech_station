@@ -36,6 +36,7 @@ class DeviceModel extends DeviceEntity {
     super.displayScore,
     super.valueScore,
     super.cameraSamples,
+    super.affiliateLinks,
     super.reviewSummary,
     super.pros,
     super.cons,
@@ -80,6 +81,7 @@ class DeviceModel extends DeviceEntity {
       displayScore: (json['display_score'] as num?)?.toDouble() ?? 0,
       valueScore: (json['value_score'] as num?)?.toDouble() ?? 0,
       cameraSamples: _parseStringList(json['camera_samples']),
+      affiliateLinks: _parseAffiliateLinks(json['affiliate_links']),
       reviewSummary: json['review_summary'] as String?,
       pros: _parseStringList(json['pros']),
       cons: _parseStringList(json['cons']),
@@ -129,6 +131,7 @@ class DeviceModel extends DeviceEntity {
       'display_score': displayScore,
       'value_score': valueScore,
       'camera_samples': cameraSamples,
+      'affiliate_links': affiliateLinks,
       'review_summary': reviewSummary,
       'pros': pros,
       'cons': cons,
@@ -140,6 +143,25 @@ class DeviceModel extends DeviceEntity {
     if (value == null) return [];
     if (value is List) {
       return value.map((e) => e.toString()).toList();
+    }
+    return [];
+  }
+
+  static List<Map<String, String>> _parseAffiliateLinks(dynamic value) {
+    if (value == null) return [];
+    if (value is List) {
+      return value
+          .map((e) {
+            if (e is Map) {
+              return {
+                'name': (e['name'] ?? '').toString(),
+                'url': (e['url'] ?? '').toString(),
+              };
+            }
+            return <String, String>{};
+          })
+          .where((m) => m.isNotEmpty && m['url']!.isNotEmpty)
+          .toList();
     }
     return [];
   }
