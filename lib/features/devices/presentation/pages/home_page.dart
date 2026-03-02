@@ -295,10 +295,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showSearch(BuildContext context) {
+    final bloc = context.read<DeviceListBloc>();
     showSearch(
       context: context,
-      delegate: _DeviceSearchDelegate(bloc: context.read<DeviceListBloc>()),
+      delegate: _DeviceSearchDelegate(bloc: bloc),
     );
+    // Restore full device list when search closes
+    bloc.add(DeviceListFetchAll());
   }
 }
 
@@ -332,9 +335,21 @@ class _DeviceSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    if (query.isNotEmpty) {
-      bloc.add(DeviceListSearch(query));
+    return _buildSearchResults(context);
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return _buildSearchResults(context);
+  }
+
+  Widget _buildSearchResults(BuildContext context) {
+    if (query.trim().isEmpty) {
+      return const Center(child: Text('Search for phones by name or brand'));
     }
+
+    bloc.add(DeviceListSearch(query.trim()));
+
     return BlocBuilder<DeviceListBloc, DeviceListState>(
       bloc: bloc,
       builder: (context, state) {
@@ -370,10 +385,5 @@ class _DeviceSearchDelegate extends SearchDelegate<String> {
         return const SizedBox.shrink();
       },
     );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return const Center(child: Text('Search for phones by name or brand'));
   }
 }

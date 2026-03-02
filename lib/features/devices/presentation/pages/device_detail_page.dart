@@ -16,9 +16,11 @@ import '../bloc/device_detail_event.dart';
 import '../bloc/device_detail_state.dart';
 import '../widgets/score_badge.dart';
 import '../widgets/spec_table.dart';
-import '../widgets/review_section.dart';
 import '../widgets/camera_samples_gallery.dart';
 import '../widgets/affiliate_links_section.dart';
+import '../../../comments/presentation/widgets/comments_section.dart';
+import '../../../comments/presentation/bloc/comments_bloc.dart';
+import '../../../comments/presentation/bloc/comments_event.dart';
 
 class DeviceDetailPage extends StatefulWidget {
   final String deviceId;
@@ -349,7 +351,7 @@ class _DeviceDetailPageState extends State<DeviceDetailPage>
               Tab(text: 'Overview'),
               Tab(text: 'Specs'),
               Tab(text: 'Camera'),
-              Tab(text: 'Reviews'),
+              Tab(text: 'Community'),
             ],
           ),
 
@@ -361,7 +363,7 @@ class _DeviceDetailPageState extends State<DeviceDetailPage>
                 _buildOverviewTab(device),
                 _buildSpecsTab(device),
                 _buildCameraTab(device),
-                _buildReviewsTab(device),
+                _buildCommunityTab(device),
               ],
             ),
           ),
@@ -490,14 +492,9 @@ class _DeviceDetailPageState extends State<DeviceDetailPage>
     );
   }
 
-  Widget _buildReviewsTab(DeviceEntity device) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: ReviewSection(
-        reviewSummary: device.reviewSummary,
-        pros: device.pros,
-        cons: device.cons,
-      ),
-    );
+  Widget _buildCommunityTab(DeviceEntity device) {
+    // Trigger initial fetch of comments
+    context.read<CommentsBloc>().add(CommentsFetch(device.id));
+    return CommentsSection(deviceId: device.id);
   }
 }

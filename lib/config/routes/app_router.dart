@@ -17,6 +17,7 @@ import '../../features/account/presentation/pages/account_page.dart';
 import '../../injection_container.dart';
 import '../../features/devices/domain/usecases/get_device_by_id.dart';
 import '../../features/devices/domain/usecases/upload_camera_sample.dart';
+import '../../features/comments/presentation/bloc/comments_bloc.dart';
 
 class AppRouter {
   AppRouter._();
@@ -110,11 +111,16 @@ class AppRouter {
           parentNavigatorKey: _rootNavigatorKey,
           builder: (context, state) {
             final deviceId = state.pathParameters['id']!;
-            return BlocProvider(
-              create: (_) => DeviceDetailBloc(
-                getDeviceById: sl<GetDeviceById>(),
-                uploadCameraSample: sl<UploadCameraSample>(),
-              ),
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (_) => DeviceDetailBloc(
+                    getDeviceById: sl<GetDeviceById>(),
+                    uploadCameraSample: sl<UploadCameraSample>(),
+                  ),
+                ),
+                BlocProvider(create: (_) => sl<CommentsBloc>()),
+              ],
               child: DeviceDetailPage(deviceId: deviceId),
             );
           },

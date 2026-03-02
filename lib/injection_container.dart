@@ -21,6 +21,15 @@ import 'features/devices/domain/usecases/search_devices.dart';
 import 'features/devices/domain/usecases/upload_camera_sample.dart';
 import 'features/devices/presentation/bloc/device_list_bloc.dart';
 import 'features/account/presentation/bloc/theme_bloc.dart';
+import 'features/comments/data/datasources/comment_remote_data_source.dart';
+import 'features/comments/data/repositories/comment_repository_impl.dart';
+import 'features/comments/domain/repositories/comment_repository.dart';
+import 'features/comments/domain/usecases/get_comments.dart';
+import 'features/comments/domain/usecases/add_comment.dart';
+import 'features/comments/domain/usecases/toggle_vote.dart';
+import 'features/comments/domain/usecases/mark_as_answered.dart';
+import 'features/comments/domain/usecases/delete_comment.dart';
+import 'features/comments/presentation/bloc/comments_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -83,6 +92,35 @@ Future<void> initDependencies() async {
       getDevicesByCategory: sl(),
       searchDevices: sl(),
       getCategories: sl(),
+    ),
+  );
+
+  // ── Comments ──
+  // Data Sources
+  sl.registerLazySingleton<CommentRemoteDataSource>(
+    () => CommentRemoteDataSourceImpl(supabaseClient: supabase),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<CommentRepository>(
+    () => CommentRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(() => GetComments(sl()));
+  sl.registerLazySingleton(() => AddComment(sl()));
+  sl.registerLazySingleton(() => ToggleVote(sl()));
+  sl.registerLazySingleton(() => MarkAsAnswered(sl()));
+  sl.registerLazySingleton(() => DeleteComment(sl()));
+
+  // BLoC
+  sl.registerFactory(
+    () => CommentsBloc(
+      getComments: sl(),
+      addComment: sl(),
+      toggleVote: sl(),
+      markAsAnswered: sl(),
+      deleteComment: sl(),
     ),
   );
 
