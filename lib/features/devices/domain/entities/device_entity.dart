@@ -46,6 +46,9 @@ class DeviceEntity extends Equatable {
   // ── Affiliate Links ──
   final List<Map<String, String>> affiliateLinks;
 
+  // ── Available Colors ──
+  final List<String> availableColors;
+
   // ── Review ──
   final String? reviewSummary;
   final List<String> pros;
@@ -92,6 +95,7 @@ class DeviceEntity extends Equatable {
     this.valueScore = 0,
     this.cameraSamples = const [],
     this.affiliateLinks = const [],
+    this.availableColors = const [],
     this.reviewSummary,
     this.pros = const [],
     this.cons = const [],

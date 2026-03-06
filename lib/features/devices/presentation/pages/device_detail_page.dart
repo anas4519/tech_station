@@ -18,6 +18,7 @@ import '../widgets/score_badge.dart';
 import '../widgets/spec_table.dart';
 import '../widgets/camera_samples_gallery.dart';
 import '../widgets/affiliate_links_section.dart';
+import '../widgets/device_color_map.dart';
 import '../../../comments/presentation/widgets/comments_section.dart';
 import '../../../comments/presentation/bloc/comments_bloc.dart';
 import '../../../comments/presentation/bloc/comments_event.dart';
@@ -37,6 +38,7 @@ class _DeviceDetailPageState extends State<DeviceDetailPage>
   String _physicalDeviceModel = '';
   bool _isUploading = false;
   List<String>? _updatedSamples;
+  int _currentImagePage = 0;
 
   @override
   void initState() {
@@ -168,57 +170,7 @@ class _DeviceDetailPageState extends State<DeviceDetailPage>
           stretch: true,
           backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
           flexibleSpace: FlexibleSpaceBar(
-            background: Stack(
-              fit: StackFit.expand,
-              children: [
-                // ── Hero Image ──
-                if (device.imageUrl != null)
-                  CachedNetworkImage(
-                    imageUrl: device.imageUrl!,
-                    fit: BoxFit.cover,
-                    placeholder: (_, __) => Container(
-                      color: isDark
-                          ? AppColors.darkElevated
-                          : AppColors.grey100,
-                    ),
-                    errorWidget: (_, __, ___) => Container(
-                      color: isDark
-                          ? AppColors.darkElevated
-                          : AppColors.grey100,
-                      child: const Icon(Icons.smartphone_rounded, size: 80),
-                    ),
-                  )
-                else
-                  Container(
-                    color: isDark ? AppColors.darkElevated : AppColors.grey100,
-                    child: Icon(
-                      Icons.smartphone_rounded,
-                      size: 80,
-                      color: isDark ? AppColors.grey600 : AppColors.grey400,
-                    ),
-                  ),
-                // ── Gradient bottom ──
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    height: 100,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          (isDark ? AppColors.darkBg : AppColors.lightBg)
-                              .withValues(alpha: 0.9),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            background: _buildImageCarousel(device, isDark),
           ),
           actions: [
             IconButton(
@@ -293,6 +245,45 @@ class _DeviceDetailPageState extends State<DeviceDetailPage>
                       ),
                   ],
                 ),
+
+                // ── Available Colors ──
+                if (device.availableColors.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: device.availableColors.map((colorName) {
+                      final color = getDeviceColor(colorName);
+                      final isLight =
+                          ThemeData.estimateBrightnessForColor(color) ==
+                          Brightness.light;
+                      return Tooltip(
+                        message: colorName,
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isLight
+                                  ? Colors.grey.shade400
+                                  : Colors.transparent,
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: color.withValues(alpha: 0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
 
                 // ── Score Badges ──
                 if (device.overallScore > 0) ...[
@@ -496,5 +487,259 @@ class _DeviceDetailPageState extends State<DeviceDetailPage>
     // Trigger initial fetch of comments
     context.read<CommentsBloc>().add(CommentsFetch(device.id));
     return CommentsSection(deviceId: device.id);
+  }
+
+  Widget _buildImageCarousel(DeviceEntity device, bool isDark) {
+    // Combine main image + additional images
+    final allImages = <String>[
+      if (device.imageUrl != null) device.imageUrl!,
+      ...device.imageUrls,
+    ];
+
+    if (allImages.isEmpty) {
+      return Container(
+        color: isDark ? AppColors.darkElevated : AppColors.grey100,
+        child: Icon(
+          Icons.smartphone_rounded,
+          size: 80,
+          color: isDark ? AppColors.grey600 : AppColors.grey400,
+        ),
+      );
+    }
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // ── Image PageView ──
+        PageView.builder(
+          itemCount: allImages.length,
+          onPageChanged: (index) {
+            if (mounted) setState(() => _currentImagePage = index);
+          },
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () => _openFullScreenImage(context, allImages, index),
+              child: CachedNetworkImage(
+                imageUrl: allImages[index],
+                fit: BoxFit.cover,
+                placeholder: (_, __) => Container(
+                  color: isDark ? AppColors.darkElevated : AppColors.grey100,
+                ),
+                errorWidget: (_, __, ___) => Container(
+                  color: isDark ? AppColors.darkElevated : AppColors.grey100,
+                  child: const Icon(Icons.broken_image_rounded, size: 60),
+                ),
+              ),
+            );
+          },
+        ),
+
+        // ── Gradient bottom ──
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            height: 100,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  (isDark ? AppColors.darkBg : AppColors.lightBg).withValues(
+                    alpha: 0.9,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        // ── Dot indicators ──
+        if (allImages.length > 1)
+          Positioned(
+            bottom: 12,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(allImages.length, (i) {
+                final isActive = i == _currentImagePage;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  width: isActive ? 18 : 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: isActive
+                        ? (isDark ? AppColors.accentLight : AppColors.primary)
+                        : (isDark ? AppColors.grey600 : AppColors.grey400),
+                  ),
+                );
+              }),
+            ),
+          ),
+      ],
+    );
+  }
+
+  void _openFullScreenImage(
+    BuildContext context,
+    List<String> images,
+    int initialIndex,
+  ) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.black87,
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return _FullScreenImageViewer(
+            images: images,
+            initialIndex: initialIndex,
+          );
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
+  }
+}
+
+class _FullScreenImageViewer extends StatefulWidget {
+  final List<String> images;
+  final int initialIndex;
+
+  const _FullScreenImageViewer({
+    required this.images,
+    required this.initialIndex,
+  });
+
+  @override
+  State<_FullScreenImageViewer> createState() => _FullScreenImageViewerState();
+}
+
+class _FullScreenImageViewerState extends State<_FullScreenImageViewer> {
+  late PageController _controller;
+  late int _currentPage;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPage = widget.initialIndex;
+    _controller = PageController(initialPage: widget.initialIndex);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          // ── Swipeable images with zoom ──
+          PageView.builder(
+            controller: _controller,
+            itemCount: widget.images.length,
+            onPageChanged: (i) => setState(() => _currentPage = i),
+            itemBuilder: (context, index) {
+              return InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: Center(
+                  child: CachedNetworkImage(
+                    imageUrl: widget.images[index],
+                    fit: BoxFit.contain,
+                    placeholder: (_, __) => const CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white54,
+                    ),
+                    errorWidget: (_, __, ___) => const Icon(
+                      Icons.broken_image_rounded,
+                      size: 60,
+                      color: Colors.white38,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+
+          // ── Close button ──
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 8,
+            right: 12,
+            child: IconButton(
+              onPressed: () => Navigator.pop(context),
+              style: IconButton.styleFrom(backgroundColor: Colors.black45),
+              icon: const Icon(
+                Icons.close_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+          ),
+
+          // ── Page counter ──
+          if (widget.images.length > 1)
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 16,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black45,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${_currentPage + 1} / ${widget.images.length}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+          // ── Dot indicators ──
+          if (widget.images.length > 1)
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 20,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(widget.images.length, (i) {
+                  final isActive = i == _currentPage;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    width: isActive ? 18 : 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3),
+                      color: isActive ? Colors.white : Colors.white38,
+                    ),
+                  );
+                }),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
